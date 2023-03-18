@@ -65,7 +65,7 @@ async def login(req: Login,session: AsyncSession = Depends(get_session)):
 
     
     
-@app.post('/image/add', dependencies=[Depends(JWTBearer())])
+@app.post('/image/add')
 async def add_post(file: UploadFile, session: AsyncSession = Depends(get_session)):
     file.filename = f"{uuid.uuid4()}.jpg"
     contents = await file.read()
@@ -75,14 +75,13 @@ async def add_post(file: UploadFile, session: AsyncSession = Depends(get_session
     result = await add_image(f'{IMAGE_DIR}{file.filename}', tags_json, session)
     return {'id': result.image_id}
     
-@app.post('/image/search', dependencies=[Depends(JWTBearer())])
+@app.post('/image/search')
 async def add_post(file: UploadFile, session: AsyncSession = Depends(get_session)):
     file.filename = f"{uuid.uuid4()}.jpg"
     path_to_file = f'{IMAGE_DIR}{file.filename}'
     contents = await file.read()
     with open(path_to_file, 'wb') as f:
         f.write(contents)
-        cv2.resize(f, (300, 200), interpolation=cv2.INTER_LINEAR)
 
     images = await get_images(session)
     images_pathes = [i[0].path for i in images]
@@ -92,7 +91,7 @@ async def add_post(file: UploadFile, session: AsyncSession = Depends(get_session
         raise HTTPException(status_code=404)
     else:
         os.remove(path_to_file)
-        return {'msg': result}
+        return {'match_index': result}
     
 @app.get('/image/{id}', response_class=FileResponse)
 async def get_image(id: int, session: AsyncSession = Depends(get_session)):
@@ -102,7 +101,15 @@ async def get_image(id: int, session: AsyncSession = Depends(get_session)):
     
     return image[0].path
 
-@app.patch('/image')
+@app.get('/image/tags/{id}')
+async def get_image_info(id: int, session: AsyncSession = Depends(get_session)):
+    image = await get_image_by_id(id, session)
+    if image is None:
+        return {'tags': []}
+    return {'tags': json.loads(image[0].tags)}
+    
+
+@app.patch('/image', dependencies=[Depends(JWTBearer())])
 async def update_tags(req: UpdateTags, session: AsyncSession = Depends(get_session)):
     image = await get_image_by_id(req.id, session)
     if image is None:

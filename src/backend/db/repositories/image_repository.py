@@ -27,4 +27,5 @@ async def update_image(image_id: int, tags: List[str], session: AsyncSession) ->
                     .where(Image.image_id == image_id)\
                     .values(tags=json.dumps(tags))
     result = await session.execute(query)
+    await session.commit()
     return result.first()
