@@ -1,5 +1,5 @@
 <template>
-  <app-header />
+  <app-header/>
   <router-view/>
 </template>
 
@@ -8,7 +8,7 @@ import AppHeader from './components/AppHeader'
 
 export default{
   components: {
-    AppHeader
+    AppHeader,
   }
 }
 </script>
