@@ -1,7 +1,6 @@
 <template>
   <div class='container'>
-    <div v-if='currentUser'>{{ currentUser }}</div>
-    <div v-else>НЕ ЗАРЕГАН</div>
+    HELLO WORLD!
   </div>
 </template>
 
