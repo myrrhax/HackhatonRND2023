@@ -5,7 +5,7 @@ SQLAlchemy==1.4.41
 asyncpg==0.27.0
 fastapi==0.87.0
 uvicorn==0.20.0
-numpy==1.24.2
+numpy==1.21.6
 opencv-python
 face-recognition==1.3.0
 SQLAlchemy-ImageAttach==1.1.0
@@ -13,3 +13,4 @@ PyJWT==2.6.0
 python-decouple==3.7
 bcrypt==4.0.1
 python-multipart==0.0.6
+Pillow==9.4.0
