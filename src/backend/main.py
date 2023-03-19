@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.session import get_session
 from db.repositories.user_repository import add_user
 from jwt_utils import sign_JWT, JWTBearer
-from face_check import recognize
+from face_check import recognize, save_photo
 import os
 import PIL.Image as Image
 import uuid
@@ -71,17 +71,19 @@ async def add_post(file: UploadFile, session: AsyncSession = Depends(get_session
     contents = await file.read()
     with open(f'{IMAGE_DIR}{file.filename}', 'wb') as f:
         f.write(contents)
+    save_photo(cv2.imread(f'{IMAGE_DIR}{file.filename}'), f'{IMAGE_DIR}{file.filename}')
     tags_json = json.dumps([])
     result = await add_image(f'{IMAGE_DIR}{file.filename}', tags_json, session)
     return {'id': result.image_id}
     
 @app.post('/image/search')
-async def add_post(file: UploadFile, session: AsyncSession = Depends(get_session)):
+async def search_post(file: UploadFile, session: AsyncSession = Depends(get_session)):
     file.filename = f"{uuid.uuid4()}.jpg"
     path_to_file = f'{IMAGE_DIR}{file.filename}'
     contents = await file.read()
-    with open(path_to_file, 'wb') as f:
+    with open(f'{IMAGE_DIR}{file.filename}', 'wb') as f:
         f.write(contents)
+    save_photo(cv2.imread(f'{IMAGE_DIR}{file.filename}'), f'{IMAGE_DIR}{file.filename}')
 
     images = await get_images(session)
     images_pathes = [i[0].path for i in images]

@@ -1,5 +1,7 @@
 <template>
-  <div class='photo' v-if=photo_url>
+  <div v-if='!notFound'>
+    <div class='photo' v-if=photo_url>
+    <b>По вашему запросу был найден человек: </b>
     <img :src='photo_url'>
     <ul class='tags'>
       <li v-for='tag in tags' :key="tag">
@@ -19,6 +21,11 @@
     </div>
     <button @click='show' v-if='image'>Найти человека</button>
   </div>
+  </div>
+  <div v-else>
+    <b>Такого человека я не знаю. Он был добавлен в мою базу!</b>
+  </div>
+  
 </template>
 
 <script>
@@ -34,7 +41,8 @@ export default {
       photo_url: null,
       image_id: null,
       tags: null,
-      tag_name: ''
+      tag_name: '',
+      notFound: null
     }
   },
   computed: {
@@ -55,15 +63,24 @@ export default {
       var interpolateUrl = require('interpolate-url');
       let bodyFormData = new FormData();
       bodyFormData.append('file', this.image);
-      const response = await axios({method: 'post', url:'http://localhost:8000/image/search', data: bodyFormData, headers: {'Content-Type': 'multipart/form-data'}})
-      if (response.data) {
-        const index = response.data.match_index
-        this.image_id = index
-        this.photo_url = interpolateUrl('http://localhost:8000/image/:id', {id: index})
-        const tagsUrl = interpolateUrl('http://localhost:8000/image/tags/:id', {id: index})
-        const tagResposne = await axios.get(tagsUrl)
-        this.tags = tagResposne.data.tags
+      console.log('SENDING REQUEST')
+      try {
+        const response = await axios({method: 'post', url:'http://localhost:8000/image/search', data: bodyFormData, headers: {'Content-Type': 'multipart/form-data'}})
+        console.log(response)
+        if (response.data) {
+          const index = response.data.match_index
+          console.log(index)
+          this.image_id = index
+          this.photo_url = interpolateUrl('http://localhost:8000/image/:id', {id: index})
+          const tagsUrl = interpolateUrl('http://localhost:8000/image/tags/:id', {id: index})
+          const tagResposne = await axios.get(tagsUrl)
+          this.tags = tagResposne.data.tags
+          this.notFound = false
+        }
+      } catch(err) {
+        this.notFound = true
       }
+      
     },
     async addTag() {
       console.log(authHeader())

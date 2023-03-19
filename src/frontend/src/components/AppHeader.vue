@@ -1,14 +1,12 @@
 <template>
-  <div class='header' style="width: 100%;height: 50px;background-color: green;">
-    <div class='wrapper'>
-        <div class='auth' v-if='!currentUser'>
-            <button @click='login'>Войти</button>
-            <button @click='registration'>Регистрация</button>
+  <div class='w-full h-24 bg-transparent'>
+        <div class='h-24 flex justify-end' v-if='!currentUser'>
+            <button @click='login' class='bg-black mt-2 rounded-3xl text-base text-white mr-7 w-28 h-10'>Войти</button>
+            <button @click='registration' class='bg-black mt-2 rounded-3xl text-base text-white mr-7 w-36 h-10'>Регистрация</button>
         </div>
-        <div v-else>
-            <button @click='logout'>Выйти</button>
+        <div class='flex justify-end' v-else>
+            <button @click='logout' class='bg-black mt-2 rounded-3xl text-base text-white mr-7 w-28 h-10'>Выйти</button>
         </div>
-    </div>
    </div>
 </template>
 
