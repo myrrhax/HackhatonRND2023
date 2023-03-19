@@ -81,9 +81,12 @@ async def search_post(file: UploadFile, session: AsyncSession = Depends(get_sess
     file.filename = f"{uuid.uuid4()}.jpg"
     path_to_file = f'{IMAGE_DIR}{file.filename}'
     contents = await file.read()
-    with open(f'{IMAGE_DIR}{file.filename}', 'wb') as f:
-        f.write(contents)
-    save_photo(cv2.imread(f'{IMAGE_DIR}{file.filename}'), f'{IMAGE_DIR}{file.filename}')
+    try:
+        with open(f'{IMAGE_DIR}{file.filename}', 'wb') as f:
+            f.write(contents)
+        save_photo(cv2.imread(f'{IMAGE_DIR}{file.filename}'), f'{IMAGE_DIR}{file.filename}')
+    except Exception:
+        return HTTPException(status_code=400)
 
     images = await get_images(session)
     images_pathes = [i[0].path for i in images]
@@ -91,6 +94,9 @@ async def search_post(file: UploadFile, session: AsyncSession = Depends(get_sess
     if result is None:
         await add_image(path_to_file, json.dumps([]), session)
         raise HTTPException(status_code=404)
+    elif result == 'NOFACES':
+        os.remove(path_to_file)
+        raise HTTPException(status_code=400)
     else:
         os.remove(path_to_file)
         return {'match_index': result}

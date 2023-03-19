@@ -13,6 +13,7 @@
     "flowbite": "^1.6.4",
     "interpolate-url": "^0.0.2",
     "vue": "^3.2.13",
+    "vue-loading-overlay": "^6.0.3",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"
   },
